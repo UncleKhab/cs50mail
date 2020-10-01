@@ -5,45 +5,62 @@ function d(selector){
   return document.querySelector(selector);
 };
 
-// 2. document.createElement
-function d_c(tag, clas, cont){
+// 2. constructor function for email list
+function item_constructor(tag, clas, cont){
   let element = document.createElement(tag);
       element.className = clas;
-      element.innerText = cont;
+      element.innerHTML = cont;
   
   return element;
 }
 
-// 3. iterate and add email
+// 3. function for event listener for subject lines
 
-function add_email(content) {
-  let subject = d_c('a', 'email-subject', content.subject);
-      subject.setAttribute('data-id', `${content.id}`);
-  let sender  = d_c('p', 'email-sender', content.sender);
-  let time    = d_c('small', 'email-time', content.timestamp);
+function em_r(id, status){
+  load_email(id, status);
+}
+// 4. iterator function for received emails
+
+function add_email_received(content) {
+  let subject = item_constructor('a', 'email-subject', content.subject);
+      subject.setAttribute('onclick', `em_r(${content.id}, 'r')`);
+      subject.setAttribute('href', '#');
+  let sender  = item_constructor('p', 'email-sender', content.sender);
+  let time    = item_constructor('small', 'email-time', content.timestamp);
 
   
   let email = document.createElement('div');
-  email.className = 'email-container'
-  email.appendChild(subject);
-  email.appendChild(sender);
-  email.appendChild(time);
+      email.className = 'email-container';
+      email.appendChild(subject);
+      email.appendChild(sender);
+      email.appendChild(time);
   
 
   d('#emails-view').append(email);
   
-  console.log(`sender: ${sender}, subject: ${subject} , time: ${time}`);
+  console.log(content);
   
 }
 
-// 4. add Event Listener to multiple items
+// 5. iterator function for sent emails
 
-function add_event() {
-  document.querySelectorAll('.email-subject').forEach(link => {
-    link.onclick = function() {
-      load_email(this.dataset.id);
-    }
-  })
+function add_email_sent(content) {
+  let subject     = item_constructor('a', 'email-subject', content.subject);
+      subject.setAttribute('onclick', `em_r(${content.id}, 's')`)
+      subject.setAttribute('href', '#');
+  let recipients  = item_constructor('p', 'email-recipient', content.recipient);
+  let time        = item_constructor('small', 'email-sender', content.timestamp);
+      
+  let email = document.createElement('div');
+      email.className = 'email-container';
+      email.appendChild(subject);
+      email.appendChild(recipients);
+      email.appendChild(time);
+
+  d('#emails-view').append(email);
+
+  console.log(content)
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -56,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // By default, load the inbox
   load_mailbox('inbox');
+
 });
 
 function compose_email() {
@@ -109,21 +127,35 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-    emails.forEach(add_email);
+    if (mailbox === 'sent'){
+      emails.forEach(add_email_sent);
+    } else {
+      emails.forEach(add_email_received);
+    }
+    
   })
-
-  // Add Events to emails
-  add_event();
   
 }
 
-function load_email(id) {
+function load_email(id, status) {
   d("#emails-view").style.display = 'none';
   d('#compose-view').style.display = 'none';
 
   fetch(`/emails/${id}`)
   .then(response => response.json())
   .then(email => {
-    console.log(email);
+    // Changing the read status when email is accessed
+
+    if((email.read === false) && (status === 'r')){
+      fetch(`/emails/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          read: true
+        })
+      })
+    }
+    
   })
+
+  
 }
