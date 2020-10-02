@@ -22,18 +22,28 @@ function em_r(id, status){
 // 4. iterator function for received emails
 
 function add_email_received(content) {
+  let archived = content.archived;
+  let id = content.id;
   let subject = item_constructor('a', 'email-subject', content.subject);
-      subject.setAttribute('onclick', `em_r(${content.id}, 'r')`);
+      subject.setAttribute('onclick', `em_r(${id}, 'r')`);
       subject.setAttribute('href', '#');
   let sender  = item_constructor('p', 'email-sender', content.sender);
   let time    = item_constructor('small', 'email-time', content.timestamp);
-
+  let archive = item_constructor('button', 'btn-small', 'Archive');
+  if(archived === false){
+    archive.innerHTML = 'Archive' 
+    archive.setAttribute('onclick', `archive_status(${id}, 't')`)
+  }else{
+    archive.innerHTML = 'Unarchive'
+    archive.setAttribute('onclick', `archive_status(${id}, 'f')`)
+  }
   
   let email = document.createElement('div');
       email.className = 'email-container';
       email.appendChild(subject);
       email.appendChild(sender);
       email.appendChild(time);
+      email.appendChild(archive);
   
 
   d('#emails-view').append(email);
@@ -60,8 +70,31 @@ function add_email_sent(content) {
   d('#emails-view').append(email);
 
   console.log(content)
+}
+
+// 6. Changed Archived Status
+
+function archive_status(id, status){
+  if(status === 't'){
+    fetch(`/emails/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: true
+      })
+    })
+    console.log("archived")
+  } else {
+    fetch(`/emails/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: false
+      })
+    })
+    console.log("unarchived")
+  }
 
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
 
