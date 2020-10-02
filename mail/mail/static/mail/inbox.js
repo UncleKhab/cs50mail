@@ -73,6 +73,7 @@ function add_email_received(content) {
     archive.innerHTML = 'Unarchive';
     archive.setAttribute('onclick', `archive_status(${id}, 't')`);
   }
+  archive.setAttribute('id', `archive-${content.id}`)
 
   let reply = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Reply');
       reply.setAttribute('onclick', `reply_email(${id})`);
