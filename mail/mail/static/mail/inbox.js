@@ -36,21 +36,22 @@ function email_display(content, status){
   
   let email = document.createElement('div');
       email.className = 'email-view-container';
-      if(status === 'r' && content.archived === true){
-        let unarchive = item_constructor('button', 'btn-small', 'Unarchive');
-        unarchive.setAttribute('onclick', `archive_status(${content.id}, 't')`);
-        email.appendChild(unarchive);
+      if(status === 'r') {
+        let reply = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Reply');
+            reply.setAttribute('onclick', `reply_email(${content.id})`);
+            email.appendChild(reply)
+        
+        if (content.archived === true){
+            let unarchive = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Unarchive');
+            unarchive.setAttribute('onclick', `archive_status(${content.id}, 't')`);
+            email.appendChild(unarchive);
+          }
       }
-
-      email.appendChild(sender);
-      email.appendChild(recipient_list);
-      email.appendChild(subject);
-      email.appendChild(time);
-      email.appendChild(body);
+      email.append(sender, recipient_list, subject, time, body);
   d('#emails-view').innerHTML = '';
   d('#emails-view').append(email);
 }
-// 4. iterator function for received emails
+// 4. iterator function for displaying emails
 
 function add_email_received(content) {
   // Getting relevant data from each email
@@ -63,8 +64,8 @@ function add_email_received(content) {
   
   let sender  = item_constructor('p', 'email-sender', content.sender, 'From');
   let time    = item_constructor('small', 'email-time', content.timestamp, 'Date Sent');
-  
-  let archive = item_constructor('button', 'btn-small', 'Archive');
+  // Creating Buttons 
+  let archive = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Archive');
   if(archived === false){
     archive.innerHTML = 'Archive'; 
     archive.setAttribute('onclick', `archive_status(${id}, 'f')`);
@@ -73,9 +74,14 @@ function add_email_received(content) {
     archive.setAttribute('onclick', `archive_status(${id}, 't')`);
   }
 
-  let reply = item_constructor('button', 'btn-small', 'Reply');
+  let reply = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Reply');
       reply.setAttribute('onclick', `reply_email(${id})`);
+  let button_container = item_constructor('div', 'button-container', ``)
+      button_container.append(reply, archive);
 
+
+  
+  // Creating Main Element
   let email = document.createElement('div');
       if(content.read === true){
         email.className += 'b-gray ';
@@ -83,11 +89,7 @@ function add_email_received(content) {
         email.className += 'b-white ';
       }
       email.className += 'email-container';
-      email.appendChild(subject);
-      email.appendChild(sender);
-      email.appendChild(time);
-      email.appendChild(archive);
-      email.appendChild(reply);
+      email.append(subject, sender, time, button_container);
   
 
   d('#emails-view').append(email);
@@ -96,7 +98,7 @@ function add_email_received(content) {
   
 }
 
-// 5. iterator function for sent emails
+// 5. iterator function for displaying sent emails
 
 function add_email_sent(content) {
   let subject     = item_constructor('a', 'email-subject', content.subject, 'Subject');
@@ -244,9 +246,7 @@ function load_mailbox(mailbox) {
     } else {
       emails.forEach(add_email_received);
     }
-    
   })
-  
 }
 
 

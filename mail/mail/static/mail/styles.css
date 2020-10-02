@@ -4,8 +4,12 @@ textarea {
 
 .email-container {
     border: 1px solid #000;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
 }
 
+/* Background Color Changer */
 .b-gray {
     background-color: #d1d1d1;
 }
@@ -13,3 +17,9 @@ textarea {
 .b-white {
     background-color: #fff;
 }
+
+/* Custom Button Modifiers */
+.btn-custom {
+    margin-right:5px;
+}
+
