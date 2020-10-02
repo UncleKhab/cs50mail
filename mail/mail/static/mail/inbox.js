@@ -58,12 +58,12 @@ function add_email_received(content) {
   let archived = content.archived;
   let id = content.id;
   
-  let subject = item_constructor('a', 'email-subject', content.subject, 'Subject');
+  let subject = item_constructor('a', 'email-subject', content.subject);
       subject.setAttribute('onclick', `load_email(${id}, 'r')`);
       subject.setAttribute('href', '#');
   
-  let sender  = item_constructor('p', 'email-sender', content.sender, 'From');
-  let time    = item_constructor('small', 'email-time', content.timestamp, 'Date Sent');
+  let sender  = item_constructor('p', 'email-sender', content.sender);
+  let time    = item_constructor('p', 'email-date', content.timestamp);
   // Creating Buttons 
   let archive = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Archive');
   if(archived === false){
@@ -76,8 +76,11 @@ function add_email_received(content) {
 
   let reply = item_constructor('button', 'btn-custom btn-sm btn btn-outline-primary', 'Reply');
       reply.setAttribute('onclick', `reply_email(${id})`);
-  let button_container = item_constructor('div', 'button-container', ``)
-      button_container.append(reply, archive);
+  // Creating Data and Buttons Divs
+  let email_buttons = item_constructor('div', 'email-buttons', ``)
+      email_buttons.append(reply, archive);
+  let email_data = item_constructor('div', 'email-data', '');
+      email_data.append(sender, subject, time)
 
 
   
@@ -89,7 +92,7 @@ function add_email_received(content) {
         email.className += 'b-white ';
       }
       email.className += 'email-container';
-      email.append(subject, sender, time, button_container);
+      email.append(email_data, email_buttons);
   
 
   d('#emails-view').append(email);
@@ -101,11 +104,11 @@ function add_email_received(content) {
 // 5. iterator function for displaying sent emails
 
 function add_email_sent(content) {
-  let subject     = item_constructor('a', 'email-subject', content.subject, 'Subject');
+  let subject     = item_constructor('a', 'email-subject email-subject-sent', content.subject, 'Subject');
       subject.setAttribute('onclick', `load_email(${content.id}, 's')`);
       subject.setAttribute('href', '#');
   
-  let recipient_list = item_constructor('p', 'recipients', '', 'To');
+  let recipient_list = item_constructor('p', 'email-recipients', '', 'Recipients');
   let recipients  = content.recipients;
       
       recipients.forEach(recipient => {
@@ -113,13 +116,15 @@ function add_email_sent(content) {
         recipient_list.appendChild(temp);
       })
   
-  let time  = item_constructor('small', 'email-sender', content.timestamp, 'Date Sent');
-      
+  let time  = item_constructor('p', 'email-date email-date-sent', content.timestamp, 'Date Sent');
+  // Constructing Div for Email Data
+  let email_data = item_constructor('div', 'email-data', '');
+      email_data.append(recipient_list, subject, time)
+  
+  // Constructing Main Div Element
   let email = document.createElement('div');
       email.className = 'email-container';
-      email.appendChild(subject);
-      email.appendChild(recipient_list);
-      email.appendChild(time);
+      email.append(email_data);
       
   d('#emails-view').append(email);
 
